@@ -1,4 +1,4 @@
-# Flop Player
+# Flop New Player
 
 网页版扫雷录像播放器
 
@@ -110,7 +110,7 @@ if (window.flop) {
 ## 关于
 
 - 本工程所有测试录像均来自[扫雷网](https://saolei.wang/)、[Authoritative Minesweeper](https://minesweepergame.com/) 公开资源及个人录像
-- 本工程的页面 UI 和实现逻辑主要参考自：Winmine、Minesweeper Arbiter 0.52.3、Minesweeper Clone 2007、 Minesweeper Clone 0.97、Freesweeper 10、Viennasweeper 3.0、Minesweeper X 1.15
+- 本工程的页面 UI 和实现逻辑主要参考自：Winmine、元扫雷、Minesweeper Arbiter 0.52.3、Minesweeper Clone 2007、 Minesweeper Clone 0.97、Freesweeper 10、Viennasweeper 3.0、Minesweeper X 1.15
 
 ## 其他
 
