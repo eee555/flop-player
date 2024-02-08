@@ -49,7 +49,7 @@ controlBar:
 common:
   loading: Lädt...
   copied: 'Kopieren erfolgreich: {0}'
-  fileSelect: 'Bitte wählen Sie eine avf/mvf/rmv/rawvf-Datei aus'
+  fileSelect: 'Bitte wählen Sie eine evf/avf/mvf/rmv/rawvf-Datei aus'
 
 error:
   copy: 'Kopieren fehlgeschlagen: {0}'

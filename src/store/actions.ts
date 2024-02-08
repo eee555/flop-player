@@ -5,6 +5,7 @@ import { store } from '@/store/index'
 import { BaseParser } from '@/game/BaseParser'
 import { VideoParser } from '@/game/VideoParser'
 import { AVFVideo } from '@/game/AVFVideo'
+import { EVFVideo } from '@/game/EVFVideo'
 import { MVFVideo } from '@/game/MVFVideo'
 import { RMVVideo } from '@/game/RMVVideo'
 import { RawVideo } from '@/game/RawVideo'
@@ -12,7 +13,7 @@ import { RawVideo } from '@/game/RawVideo'
 const { t } = i18n.global
 
 /** 录像扩展名 */
-const FileExtension = ['avf', 'mvf', 'rmv', 'rawvf'] as const
+const FileExtension = ['evf', 'avf', 'mvf', 'rmv', 'rawvf'] as const
 export type FileType = typeof FileExtension[number]
 export const isValidFileType = (value: FileType): boolean => FileExtension.includes(value)
 
@@ -21,7 +22,7 @@ export const isValidFileType = (value: FileType): boolean => FileExtension.inclu
  *
  * @param msg 错误提示信息
  */
-function messageError (msg: string) {
+function messageError(msg: string) {
   message.error(msg)
   // 取消页面加载状态，避免卡在加载页面
   store.commit('setLoading', false)
@@ -32,7 +33,7 @@ function messageError (msg: string) {
  *
  * @param name 文件名称
  */
-function getExtension (name: string) {
+function getExtension(name: string) {
   return name.indexOf('.') !== -1 ? name.substring(name.lastIndexOf('.') + 1) : ''
 }
 
@@ -43,7 +44,7 @@ function getExtension (name: string) {
  * @param callback 错误回调
  * @return {boolean} 文件数量是否合法
  */
-function checkFileNumber (fileList: FileList | undefined | null, callback: (info: string) => void): boolean {
+function checkFileNumber(fileList: FileList | undefined | null, callback: (info: string) => void): boolean {
   if (!fileList) {
     // 文件不存在
     callback(t('error.fileNotPresent'))
@@ -69,7 +70,7 @@ function checkFileNumber (fileList: FileList | undefined | null, callback: (info
  * @param callback 错误回调
  * @return {boolean} 文件类型是否合法
  */
-function checkFileType (name: string, callback: (info: string) => void): boolean {
+function checkFileType(name: string, callback: (info: string) => void): boolean {
   // 获取文件扩展名
   const extension = getExtension(name)
   if (isValidFileType(extension as FileType)) {
@@ -88,7 +89,7 @@ function checkFileType (name: string, callback: (info: string) => void): boolean
  * @param callback 错误回调
  * @return {boolean} 文件大小是否合法
  */
-function checkFileSize (size: number, name: string, callback: (info: string) => void): boolean {
+function checkFileSize(size: number, name: string, callback: (info: string) => void): boolean {
   if (size <= 0) {
     // 文件内容为空
     callback(t('error.fileEmpty', [name]))
@@ -109,7 +110,7 @@ function checkFileSize (size: number, name: string, callback: (info: string) => 
  * @param callback 错误回调
  * @return {boolean} 状态码是否合法
  */
-function checkStatus (status: number, callback: (info: string) => void): boolean {
+function checkStatus(status: number, callback: (info: string) => void): boolean {
   // 请求成功
   if (status === 200) return true
   // 无效的状态码，如：404
@@ -125,9 +126,16 @@ function checkStatus (status: number, callback: (info: string) => void): boolean
  * @param onload 解析成功的回调
  * @param onerror 解析失败的回调
  */
-function parseVideo (type: FileType, data: ArrayBuffer, onload: (video: BaseParser) => void, onerror: (info: string) => void) {
+async function parseVideo(type: FileType, data: ArrayBuffer, onload: (video: BaseParser) => void, onerror: (info: string) => void) {
   try {
     switch (type) {
+      case 'evf':
+        {
+          const efv_video = new EVFVideo(data);
+          await efv_video.init();
+          onload(new VideoParser(efv_video, false))
+          break
+        }
       case 'avf':
         onload(new VideoParser(new AVFVideo(data), false))
         break

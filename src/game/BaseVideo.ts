@@ -21,7 +21,7 @@ export interface VideoEvent {
  */
 export abstract class BaseVideo {
   private mOffset = 0
-  private readonly mData = new Uint8Array()
+  readonly mData = new Uint8Array()
 
   // 录像类的名称
   protected abstract mName: string

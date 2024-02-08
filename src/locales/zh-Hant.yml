@@ -49,7 +49,7 @@ controlBar:
 common:
   loading: 加載中...
   copied: '複製成功: {0}'
-  fileSelect: '請選擇一個 avf/mvf/rmv/rawvf 文件'
+  fileSelect: '請選擇一個 evf/avf/mvf/rmv/rawvf 文件'
 
 error:
   copy: '複製失敗: {0}'

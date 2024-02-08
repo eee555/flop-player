@@ -49,7 +49,7 @@ controlBar:
 common:
   loading: Loading...
   copied: 'Copy success: {0}'
-  fileSelect: 'Please select a avf/mvf/rmv/rawvf file'
+  fileSelect: 'Please select a evf/avf/mvf/rmv/rawvf file'
 
 error:
   copy: 'Copy failure: {0}'

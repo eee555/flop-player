@@ -116,6 +116,23 @@ export class RMVVideo extends BaseVideo {
       const e = this.video[i]
       // Mouse event
       if (e.event >= 1 && e.event <= 7) {
+        // console.log({
+        //   time: e.time,
+        //   mouse: eventNames[e.event - 1],
+        //   column: Math.floor(e.x / this.squareSize),
+        //   row: Math.floor(e.y / this.squareSize),
+        //   x: e.x,
+        //   y: e.y
+        // });
+      //   {
+      //     "time": 36656,
+      //     "mouse": "mv",
+      //     "column": 24,
+      //     "row": 15,
+      //     "x": 390,
+      //     "y": 248
+      // }
+        
         this.mEvents.push({
           time: e.time,
           mouse: eventNames[e.event - 1],
