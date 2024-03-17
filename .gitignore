@@ -27,3 +27,4 @@ diagnostics
 
 # Temp files
 /temp
+*.zip

@@ -144,7 +144,7 @@ export class EVFVideo extends BaseVideo {
       }
       
       this.video.push({
-        time: Math.round(aa.events_time(i) * 1000),
+        time: Math.round((Math.max(aa.events_time(i) + aa.get_video_start_time, 0)) * 1000),
         x: aa.events_x(i),
         y: aa.events_y(i),
         event: events_mouse as "lc" | "rc" | "lr" | "rr" | "mc" | "mr" | "mv" | "sc" | "mt"
