@@ -64,6 +64,10 @@ export type State = typeof storageDefault & {
   uri: string
   // 录像 URI 是否请求成功
   uriSuccess: boolean
+  // 录像文件原始数据
+  videoArray: Uint8Array
+  // 录像文件名
+  fileName: string
 }
 
 export const state: State = {
@@ -111,5 +115,7 @@ export const state: State = {
   exit: self !== top,
   shareLink: '',
   uri: '',
-  uriSuccess: false
+  uriSuccess: false,
+  videoArray: new Uint8Array(),
+  fileName: "",
 }

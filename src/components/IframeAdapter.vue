@@ -1,5 +1,5 @@
 <template>
-  <screen-center :style="{background: maskBackground, zIndex: -9999}" />
+  <screen-center :style="{ background: maskBackground, zIndex: -9999 }" />
 </template>
 
 <script lang="ts">
@@ -11,7 +11,7 @@ import { BaseParser } from '@/game/BaseParser'
 
 export default defineComponent({
   components: { ScreenCenter },
-  setup () {
+  setup() {
     // 隐藏当前窗口对应的全局样式名称
     const classDisplayNone = 'flop-player-display-none'
     // 裁剪元素框外内容对应的全局样式名称

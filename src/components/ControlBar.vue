@@ -1,28 +1,40 @@
 <template>
   <div class="container-control-bar">
     <a-card size="small">
-      <a-space :size="4">
+      <a-space :size="5">
         <a-button :title="$t('controlBar.replay')" size="small" @click="replayVideo">
           <template #icon>
             <ReloadOutlined />
           </template>
         </a-button>
-        <a-button :title="`${isVideoPaused ? $t('controlBar.play') : $t('controlBar.pause')}`" size="small" @click="toggleVideoPlay">
+        <a-button :title="`${isVideoPaused ? $t('controlBar.play') : $t('controlBar.pause')}`" size="small"
+          @click="toggleVideoPlay">
           <template #icon>
             <CaretRightOutlined v-if="isVideoPaused" />
             <PauseOutlined v-else />
           </template>
         </a-button>
-        <a-button :title="`${isVideoMap ? $t('controlBar.hideVideoMap') : $t('controlBar.displayVideoMap')}`" size="small" @click="toggleVideoMap">
+        <a-button :title="`${isVideoMap ? $t('controlBar.hideVideoMap') : $t('controlBar.displayVideoMap')}`"
+          size="small" @click="toggleVideoMap">
           <template #icon>
             <EyeInvisibleOutlined v-if="isVideoMap" />
             <EyeOutlined v-else />
           </template>
         </a-button>
-        <a-slider v-model:value="speedSlider" :max="SPEED_ARRAY.length - 1" :tooltipVisible="false" style="width: 80px" />
-        <a-button :title="$t('controlBar.reset')" class="text-btn" size="small" type="text" @click="resetSpeed">{{ speedValue }}x</a-button>
+        <a-button :title="`${isVideoMap ? $t('controlBar.hideVideoMap') : $t('controlBar.displayVideoMap')}`"
+          size="small" @click="download()">
+          <template #icon>
+            <DownloadOutlined />
+          </template>
+        </a-button>
+        <a-slider v-model:value="speedSlider" :max="SPEED_ARRAY.length - 1" :tooltipVisible="false"
+          style="width: 80px" />
+        <a-button :title="$t('controlBar.reset')" class="text-btn" size="small" type="text" @click="resetSpeed">{{
+        speedValue
+      }}x</a-button>
         <!-- 从录像播放模式切换到 UPK 时，timeMax 先变更为 0，导致 timeSlider 无法重置为 0，通过将 key 值设置为 timeMax 的方式强制更新进度条的值 -->
-        <a-slider :key="timeMax" v-model:value="timeSlider" :max="timeMax" :tooltipVisible="false" style="width: 240px" />
+        <a-slider :key="timeMax" v-model:value="timeSlider" :max="timeMax" :tooltipVisible="false"
+          style="width: 240px" />
         <a-input-number v-model:value="timeValue" :precision="3" size="small" />
       </a-space>
     </a-card>
@@ -35,11 +47,11 @@ import { store } from '@/store'
 import { SPEED_ARRAY } from '@/game/constants'
 import { divide, round, times } from 'number-precision'
 import { useThrottleFn } from '@vueuse/core'
-import { CaretRightOutlined, EyeInvisibleOutlined, EyeOutlined, PauseOutlined, ReloadOutlined } from '@ant-design/icons-vue'
+import { CaretRightOutlined, EyeInvisibleOutlined, EyeOutlined, PauseOutlined, ReloadOutlined, DownloadOutlined } from '@ant-design/icons-vue'
 
 export default defineComponent({
-  components: { CaretRightOutlined, PauseOutlined, ReloadOutlined, EyeOutlined, EyeInvisibleOutlined },
-  setup () {
+  components: { CaretRightOutlined, PauseOutlined, ReloadOutlined, EyeOutlined, EyeInvisibleOutlined, DownloadOutlined },
+  setup() {
     // 重放录像
     const replayVideo = () => store.commit('replayVideo')
     // 录像是否处于暂停状态（录像播放结束也认为处于暂停状态）
@@ -58,6 +70,10 @@ export default defineComponent({
         // 暂停录像播放
         store.commit('setVideoPaused')
       }
+    }
+
+    const download = () => {
+      store.commit('downloadFile');
     }
 
     // 录像地图是否处于显示状态
@@ -120,7 +136,7 @@ export default defineComponent({
       }
     })
 
-    return { replayVideo, isVideoPaused, toggleVideoPlay, isVideoMap, toggleVideoMap, speedSlider, speedValue, resetSpeed, SPEED_ARRAY, timeMax, timeSlider, timeValue }
+    return { replayVideo, isVideoPaused, toggleVideoPlay, isVideoMap, toggleVideoMap, speedSlider, speedValue, resetSpeed, SPEED_ARRAY, timeMax, timeSlider, timeValue, download }
   }
 })
 </script>

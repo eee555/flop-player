@@ -142,6 +142,27 @@ export const mutations = {
   setURISuccess: (state: State, uriSuccess: boolean): void => {
     state.uriSuccess = uriSuccess
   },
+
+  setVideoArray: (state: State, videoArray: Uint8Array): void => {
+    state.videoArray = videoArray
+  },
+  setFileName: (state: State, fileName: string): void => {
+    state.fileName = fileName
+  },
+
+  downloadFile: (state: State): void => {
+    const blob = new Blob([state.videoArray], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = state.fileName; // 设置下载文件名  
+    a.style.display = 'none'; // 隐藏a标签  
+    document.body.appendChild(a); // 将a标签添加到DOM中  
+    a.click();
+    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  },
+
   /** 切换问号标记模式 */
   toggleMarks: (state: State): void => {
     state.marks = !state.marks
@@ -326,7 +347,7 @@ export const mutations = {
     // 重置游戏开始时间
     state.gameStartTime = 0.0
     // 直接使用 requestAnimationFrame 回调的时间戳，可能会有较大误差，包括回调时间戳本身的误差和小数计算产生的误差，特别是在 Vuex 开启严格模式的时候
-    const animationId = requestAnimationFrame(function performEvent () {
+    const animationId = requestAnimationFrame(function performEvent() {
       const timestamp = Date.now()
       // 此处不判断当前游戏事件索引是否大于游戏事件数量，因为非录像模式下两者是相等的，如：UPK
       if (state.videoAnimationId !== animationId || state.exit) {
@@ -356,7 +377,8 @@ const EmptyPayloadFunction = [
   'performNextEvent',
   'resetGame',
   'replayVideo',
-  'playVideo'
+  'playVideo',
+  'downloadFile',
 ] as const
 
 /** payload 参数不能为空的函数类型集合 */

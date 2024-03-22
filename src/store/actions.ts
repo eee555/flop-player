@@ -128,6 +128,8 @@ function checkStatus(status: number, callback: (info: string) => void): boolean 
  */
 async function parseVideo(type: FileType, data: ArrayBuffer, onload: (video: BaseParser) => void, onerror: (info: string) => void) {
   try {
+
+
     switch (type) {
       case 'evf':
         {
@@ -184,7 +186,16 @@ export const actions = {
     request.onload = () => {
       if (!checkStatus(request.status, onerror) || !checkFileSize(request.response.byteLength, uri, onerror)) return
       // 解析录像数据
-      parseVideo(getExtension(uri) as FileType, request.response, onload, onerror)
+      const contentDisposition = request.getResponseHeader('Content-Disposition');
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="([^"]*)"/);
+        if (filenameMatch) {
+          const filename = filenameMatch[1];
+          context.commit('setFileName', filename)
+          context.commit('setVideoArray', request.response)
+          parseVideo(getExtension(uri) as FileType, request.response, onload, onerror)
+        }
+      }
     }
     request.onerror = (e) => {
       console.error(e)
@@ -214,6 +225,8 @@ export const actions = {
     const reader = new FileReader()
     reader.onload = function () {
       // 解析录像数据
+      context.commit('setFileName', file.name)
+      context.commit('setVideoArray', reader.result as ArrayBuffer)
       parseVideo(getExtension(file.name) as FileType, reader.result as ArrayBuffer, onload, onerror)
     }
     reader.onerror = function (e) {
