@@ -190,12 +190,17 @@ export const actions = {
       if (contentDisposition) {
         const filenameMatch = contentDisposition.match(/filename="([^"]*)"/);
         if (filenameMatch) {
-          const filename = filenameMatch[1];
+          const filename = decodeURI(filenameMatch[1]);
           context.commit('setFileName', filename)
           context.commit('setVideoArray', request.response)
           parseVideo(getExtension(uri) as FileType, request.response, onload, onerror)
+        } else {
+          return
         }
+      } else {
+        return
       }
+      // parseVideo(getExtension(uri) as FileType, request.response, onload, onerror)
     }
     request.onerror = (e) => {
       console.error(e)
