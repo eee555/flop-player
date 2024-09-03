@@ -116,7 +116,6 @@ if (window.flop) {
 
 - [Ant Design Vue](https://github.com/vueComponent/ant-design-vue)：🌈 An enterprise-class UI components based on Ant Design and Vue. 🐜
 - [Babel](https://github.com/babel/babel)：🐠 Babel is a compiler for writing next generation JavaScript.
-- [chardet](https://github.com/runk/node-chardet)：Character encoding detection tool for NodeJS
 - [copy-text-to-clipboard](https://github.com/sindresorhus/copy-text-to-clipboard)：Copy text to the clipboard in modern browsers (0.2 kB)
 - [Day.js](https://github.com/iamkun/dayjs)：⏰ Day.js 2kB immutable date-time library alternative to Moment.js with the same modern API
 - [ESLint](https://github.com/eslint/eslint)：Find and fix problems in your JavaScript code.

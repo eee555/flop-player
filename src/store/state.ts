@@ -111,7 +111,8 @@ export const state: State = {
   gameLeftPoints: [],
   gameRightPoints: [],
   gameDoublePoints: [],
-  loading: false,
+  // 打包时true，开发时false
+  loading: true,
   exit: self !== top,
   shareLink: '',
   uri: '',

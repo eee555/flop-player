@@ -123,7 +123,7 @@ export class EVFVideo extends BaseVideo {
         }
       }
     }
-    this.name = aa.get_player_designator
+    this.name = aa.get_player_identifier
     if(total_10 != this.m){
       this.error('不能播放没有扫完的录像。')
     }
