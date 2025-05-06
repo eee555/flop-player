@@ -102,7 +102,7 @@ export class AVFVideo extends BaseVideo {
   // 3bvs
   private bbbvs = 0.0
 
-  constructor (data: ArrayBuffer) {
+  constructor(data: ArrayBuffer) {
     super(data)
     // 解析 AVF 录像
     if (!this.readavf()) {
@@ -159,7 +159,9 @@ export class AVFVideo extends BaseVideo {
       event.row = Math.floor(current.y / 16)
       event.x = current.x
       event.y = current.y
-      this.mEvents.push(event)
+      if (event.x < 16 * this.getWidth()) {
+        this.mEvents.push(event)
+      }
     }
   }
 
@@ -169,14 +171,14 @@ export class AVFVideo extends BaseVideo {
    * @param str 要转换为整数的字符串
    * @return {number} 返回转换后的整数，如果没有执行有效的转换，则返回零
    */
-  private static atoi (str: string): number {
+  private static atoi(str: string): number {
     return parseInt(str) || 0
   }
 
   /**
    * Function is used to read Realtime and Skin values
    */
-  private getpair (c1: string[], c2: string[]) {
+  private getpair(c1: string[], c2: string[]) {
     // Initialise local variables
     let i = 0
     let c = ''
@@ -205,7 +207,7 @@ export class AVFVideo extends BaseVideo {
   /**
    * Function is used to read video data
    */
-  private readavf () {
+  private readavf() {
     // Initialise local variables
     let i: number
     let cur = 0

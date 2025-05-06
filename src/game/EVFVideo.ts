@@ -80,7 +80,7 @@ export class EVFVideo extends BaseVideo {
       const e = this.video[i]
       // Mouse event
       
-      if (e.event) {
+      if (e.event && e.x < this.squareSize * this.getWidth()) {
         this.mEvents.push({
           time: e.time,
           mouse: e.event,
