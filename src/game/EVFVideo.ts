@@ -32,7 +32,7 @@ export class EVFVideo extends BaseVideo {
   private h = 0
   // Mines
   private m = 0
-  // Number of game events
+  // Number of game events(多余，拟废弃)
   private size = 0
   // Stores board and mine locations
   private board: number[] = []
@@ -76,7 +76,7 @@ export class EVFVideo extends BaseVideo {
     // 设置录像事件
     // const eventNames: ('mv' | 'lc' | 'lr' | 'rc' | 'rr' | 'mc' | 'mr')[] = ['mv', 'lc', 'lr', 'rc', 'rr', 'mc', 'mr']
     
-    for (let i = 0; i < this.size; ++i) {
+    for (let i = 0; i < this.video.length; ++i) {
       const e = this.video[i]
       // Mouse event
       
@@ -112,7 +112,7 @@ export class EVFVideo extends BaseVideo {
     this.qm = 0;
     this.level = aa.level - 3;
     aa.current_time = 1e8;
-    let game_board = JSON.parse(aa.game_board) as Array<Array<number>>;
+    let game_board: Array<Array<number>> = aa.game_board;
     this.board = new Array(this.w * this.h).fill(0)
     let total_10 = 0; // 每扫开的格子数量，看是否等于雷数
     for(i = 0; i < this.h; i++){
@@ -149,7 +149,7 @@ export class EVFVideo extends BaseVideo {
           this.error('鼠标状态和鼠标操作发生矛盾。')
         }
       } else {
-        events_mouse = e.events_mouse;
+        events_mouse = e.mouse;
       }
       mouse_state_old = e.mouse_state;
       

@@ -151,7 +151,7 @@ export const mutations = {
   },
 
   downloadFile: (state: State): void => {
-    const blob = new Blob([state.videoArray], { type: 'application/octet-stream' });
+    const blob = new Blob([new Uint8Array(state.videoArray)], { type: 'application/octet-stream' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
