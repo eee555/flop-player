@@ -112,7 +112,7 @@ export const state: State = {
   gameRightPoints: [],
   gameDoublePoints: [],
   // 打包时true，开发时false
-  loading: false,
+  loading: true,
   exit: self !== top,
   shareLink: '',
   uri: '',

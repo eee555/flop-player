@@ -16,26 +16,27 @@ module.exports = {
     },
   },
   chainWebpack: config => {
-  config.plugin('copy').tap(([options]) => {
-      // 复制 public 文件夹时忽略测试文件
-      if (options.patterns && options.patterns[0]) {
-        // 确保 globOptions 和 ignore 数组存在
-        if (!options.patterns[0].globOptions) {
-          options.patterns[0].globOptions = {}
+    config.plugin('copy').tap((args) => {
+      // args 是一个数组，args[0].patterns 就是 CopyWebpackPlugin 的配置
+      const patterns = args[0].patterns.map((p) => {
+        // 保留原来的配置，但加上 ignore 规则
+        return {
+          ...p,
+          globOptions: {
+            ...p.globOptions,
+            ignore: [
+              ...(p.globOptions?.ignore || []),
+              '**/favicon.ico',
+              '**/demo.html',
+              '**/index.css',
+              '**/videos/**/*',
+            ],
+          },
         }
-        if (!options.patterns[0].globOptions.ignore) {
-          options.patterns[0].globOptions.ignore = []
-        }
-        
-        // 添加要忽略的文件
-        options.patterns[0].globOptions.ignore.push(
-          'favicon.ico', 
-          'demo.html', 
-          'index.css', 
-          'videos/**/*'
-        )
-      }
-      return [options]
+      })
+
+      args[0].patterns = patterns
+      return args
     })
   },
   // https://cli.vuejs.org/config/#configurewebpack
