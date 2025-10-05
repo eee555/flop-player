@@ -208,6 +208,8 @@ export const actions = {
       onerror(t('error.uriRequest', [uri]))
     }
     request.open('GET', uri)
+    // 自动带上主页面已有的 cookie
+    request.withCredentials = true
     request.responseType = 'arraybuffer'
     request.send()
   },
