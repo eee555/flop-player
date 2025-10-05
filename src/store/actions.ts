@@ -153,7 +153,7 @@ async function parseVideo(type: FileType, data: ArrayBuffer, onload: (video: Bas
       default:
         onerror(`${t('error.videoParse')}${t('error.fileUnsupported')}`)
     }
-  } catch (e) {
+  } catch (e: any) {
     console.error(e)
     // 展示录像解析失败的相关信息
     onerror(`${t('error.videoParse')}${e.message}`)

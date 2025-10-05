@@ -6,15 +6,46 @@ module.exports = {
   // https://cli.vuejs.org/config/#productionsourcemap
   productionSourceMap: false,
   // https://cli.vuejs.org/config/#chainwebpack
+  css: {
+    loaderOptions: {
+      less: {
+        lessOptions: {
+          javascriptEnabled: true, // ✅ 关键配置
+        },
+      },
+    },
+  },
   chainWebpack: config => {
-    config.plugin('copy').tap(([options]) => {
-      // 复制 public 文件夹时忽略测试文件，在 configureWebpack 中配置无法生效
-      options[0].ignore.push('favicon.ico', 'demo.html', 'index.css', 'videos/**/*')
+  config.plugin('copy').tap(([options]) => {
+      // 复制 public 文件夹时忽略测试文件
+      if (options.patterns && options.patterns[0]) {
+        // 确保 globOptions 和 ignore 数组存在
+        if (!options.patterns[0].globOptions) {
+          options.patterns[0].globOptions = {}
+        }
+        if (!options.patterns[0].globOptions.ignore) {
+          options.patterns[0].globOptions.ignore = []
+        }
+        
+        // 添加要忽略的文件
+        options.patterns[0].globOptions.ignore.push(
+          'favicon.ico', 
+          'demo.html', 
+          'index.css', 
+          'videos/**/*'
+        )
+      }
       return [options]
     })
   },
   // https://cli.vuejs.org/config/#configurewebpack
   configureWebpack: {
+    cache: {
+      type: 'filesystem' // 使用文件系统进行持久化缓存
+    },
+    experiments: {
+      asyncWebAssembly: true,
+    },
     module: {
       rules: [
         {

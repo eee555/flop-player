@@ -47,7 +47,7 @@ export const mutations = {
   /** 设置当前语言 */
   setLocale: (state: State, locale: string): void => {
     if (i18n.global.availableLocales.includes(locale)) {
-      state.locale = locale
+      state.locale.value = locale
     }
   },
   /** 设置游戏开始的时间（毫秒） */

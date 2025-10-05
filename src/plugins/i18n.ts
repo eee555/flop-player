@@ -5,9 +5,9 @@ import { LocaleMessages } from '@intlify/core-base'
 /**
  * 加载所有本地化信息
  */
-function loadLocaleMessages () {
+function loadLocaleMessages(): Record<string, Record<string, VueMessageType>> {
   const locales = require.context('../locales', true, /[A-Za-z0-9-_,\s]+\.ya?ml$/i)
-  const messages: LocaleMessages<VueMessageType> = {}
+  const messages: Record<string, Record<string, VueMessageType>> = {}
   locales.keys().forEach(key => {
     const matched = key.match(/([A-Za-z0-9-_]+)\./i)
     if (matched && matched.length > 1) {
@@ -46,10 +46,10 @@ function getDefaultLocale () {
  * 配置 Vue I18n，开发工具参见：https://kazupon.github.io/vue-i18n/guide/tooling.html
  */
 export const i18n = createI18n({
-  // 基础配置，https://vue-i18n.intlify.dev/ja/guide/advanced/composition.html#basic-usage
+  legacy: false,
   fallbackLocale: 'en',
   locale: getDefaultLocale(),
-  messages: loadLocaleMessages()
+  messages: loadLocaleMessages(),
 })
 
 export default (app: App<Element>): void => {
