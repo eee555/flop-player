@@ -12,7 +12,7 @@ export class CustomVideo extends BaseVideo {
   protected mEvents: VideoEvent[] = []
 
   constructor (width: number, height: number, mines: number, marks: boolean, level: number, board: number[]) {
-    super(new Uint8Array())
+    super(new ArrayBuffer(0))
     this.mWidth = width
     this.mHeight = height
     this.mMines = mines

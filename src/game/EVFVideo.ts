@@ -102,17 +102,17 @@ export class EVFVideo extends BaseVideo {
 
     const ms = await import("ms-toollib");
 
-    let aa = ms.EvfVideo.new(this.mData, "");
+    let aa = new ms.EvfVideo(this.mData, "");
     aa.parse_video();
     aa.analyse();
-    this.w = aa.get_column;
-    this.h = aa.get_row;
-    this.m = aa.get_mine_num;
-    this.squareSize = aa.get_pix_size;
+    this.w = aa.column;
+    this.h = aa.row;
+    this.m = aa.mine_num;
+    this.squareSize = aa.pix_size;
     this.qm = 0;
-    this.level = aa.get_level - 3;
+    this.level = aa.level - 3;
     aa.current_time = 1e8;
-    let game_board = JSON.parse(aa.get_game_board) as Array<Array<number>>;
+    let game_board = JSON.parse(aa.game_board) as Array<Array<number>>;
     this.board = new Array(this.w * this.h).fill(0)
     let total_10 = 0; // 每扫开的格子数量，看是否等于雷数
     for(i = 0; i < this.h; i++){
@@ -123,30 +123,40 @@ export class EVFVideo extends BaseVideo {
         }
       }
     }
-    this.name = aa.get_player_identifier
+    this.name = new TextEncoder().encode(aa.player_identifier)
     if(total_10 != this.m){
       this.error('不能播放没有扫完的录像。')
     }
     
-    this.size = aa.get_events_len;
-    for(i = 0; i < aa.get_events_len; i++){
+    
+    // ms::MouseState::UpUp => 1,
+    // ms::MouseState::UpDown => 2,
+    // ms::MouseState::UpDownNotFlag => 3,
+    // ms::MouseState::DownUp => 4,
+    // ms::MouseState::Chording => 5,
+    // ms::MouseState::ChordingNotFlag => 6,
+    // ms::MouseState::DownUpAfterChording => 7,
+    // ms::MouseState::Undefined => 8,
+    let mouse_state_old = 8; // 记录上一个鼠标状态
+    for (let e of aa.events) {
       let events_mouse;
-      if(aa.events_mouse(i) == "cc"){
-        if(aa.events_mouse_state(i - 1) == 2 || aa.events_mouse_state(i - 1) == 3){
+      if(e.mouse == "cc"){
+        if(mouse_state_old == 2 || mouse_state_old == 3){
           events_mouse = "lc";
-        } else if (aa.events_mouse_state(i - 1) == 4 || aa.events_mouse_state(i - 1) == 7) {
+        } else if (mouse_state_old == 4 || mouse_state_old == 7) {
           events_mouse = "rc";
         } else{
           this.error('鼠标状态和鼠标操作发生矛盾。')
         }
       } else {
-        events_mouse = aa.events_mouse(i);
+        events_mouse = e.events_mouse;
       }
+      mouse_state_old = e.mouse_state;
       
       this.video.push({
-        time: Math.round((Math.max(aa.events_time(i) + aa.get_video_start_time, 0)) * 1000),
-        x: aa.events_x(i),
-        y: aa.events_y(i),
+        time: Math.round((Math.max(e.time + aa.video_start_time, 0)) * 1000),
+        x: e.x,
+        y: e.y,
         event: events_mouse as "lc" | "rc" | "lr" | "rr" | "mc" | "mr" | "mv" | "sc" | "mt"
       })
     }
