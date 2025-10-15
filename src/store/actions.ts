@@ -208,7 +208,8 @@ export const actions = {
       onerror(t('error.uriRequest', [uri]))
     }
     request.open('GET', uri)
-    // 自动带上主页面已有的 cookie
+    // 自动带上主页面已有的cookie。此配置纯粹是为了本地开发调试。因为生产环境同域，cookie会自动携带；
+    // 开发环境跨域，cookie不会自动携带，如缺少此配置，比赛录像无法播放。
     request.withCredentials = true
     request.responseType = 'arraybuffer'
     request.send()
