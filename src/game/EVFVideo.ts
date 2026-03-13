@@ -103,7 +103,7 @@ export class EVFVideo extends BaseVideo {
     const ms = await import("ms-toollib");
 
     let aa = new ms.EvfVideo(this.mData, "");
-    aa.parse_video();
+    aa.parse();
     aa.analyse();
     this.w = aa.column;
     this.h = aa.row;
