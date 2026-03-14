@@ -16,7 +16,7 @@
     "copy-text-to-clipboard": "^3.0.1",
     "core-js": "^3.6.5",
     "dayjs": "^1.10.7",
-    "ms-toollib": "1.5.3",
+    "ms-toollib": "*",
     "number-precision": "^1.5.0",
     "vue": "^3.4.0",
     "vue-i18n": "^11.1.12",
