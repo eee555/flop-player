@@ -139,8 +139,12 @@ export class EVFVideo extends BaseVideo {
     // ms::MouseState::Undefined => 8,
     let mouse_state_old = 8; // 记录上一个鼠标状态
     for (let e of aa.events) {
+      if(!e.event.is_mouse()){
+        continue;
+      }
+      const e_mouse = e.event.unwrap_mouse();
       let events_mouse;
-      if(e.mouse == "cc"){
+      if(e_mouse.mouse == "cc"){
         if(mouse_state_old == 2 || mouse_state_old == 3){
           events_mouse = "lc";
         } else if (mouse_state_old == 4 || mouse_state_old == 7) {
@@ -149,14 +153,14 @@ export class EVFVideo extends BaseVideo {
           this.error('鼠标状态和鼠标操作发生矛盾。')
         }
       } else {
-        events_mouse = e.mouse;
+        events_mouse = e_mouse.mouse;
       }
       mouse_state_old = e.mouse_state;
       
       this.video.push({
         time: Math.round((Math.max(e.time + aa.video_start_time, 0)) * 1000),
-        x: e.x,
-        y: e.y,
+        x: e_mouse.x,
+        y: e_mouse.y,
         event: events_mouse as "lc" | "rc" | "lr" | "rr" | "mc" | "mr" | "mv" | "sc" | "mt"
       })
     }
