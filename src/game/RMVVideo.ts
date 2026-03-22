@@ -28,19 +28,19 @@ interface Event {
   time: number
   x: number
   y: number
-  event: number
+  event: 'lc' | 'lr' | 'rc' | 'rr' | 'mc' | 'mr' | 'mv' | 'sc' | 'mt'
 }
 
 export class RMVVideo extends BaseVideo {
   protected readonly mName = 'RMVVideo'
-  protected readonly mWidth: number
-  protected readonly mHeight: number
-  protected readonly mMines: number
-  protected readonly mMarks: boolean
-  protected readonly mLevel: number
-  protected readonly mBoard: number[]
-  protected readonly mPlayer: Uint8Array
-  protected readonly mEvents: VideoEvent[] = []
+  protected mWidth: number
+  protected mHeight: number
+  protected mMines: number
+  protected mMarks: boolean
+  protected mLevel: number
+  protected mBoard: number[]
+  protected mPlayer: Uint8Array
+  protected mEvents: VideoEvent[] = []
 
   // Mode
   private mode = 0
@@ -61,46 +61,29 @@ export class RMVVideo extends BaseVideo {
   // Style
   private nf = 0
   // Player name
-  private name: number[] = []
-  // Player nickname
-  private nick: number[] = []
-  // Player country
-  private country: number[] = []
-  // Player token
-  private token: number[] = []
-  // Program
-  private program = ''
-  // Version string
-  private version = ''
-  // Substring of Version
-  private verstring = ''
-  // Substring of Version
-  private verlength = ''
-  // Timestamp
-  private timestamp = ''
+  private name: Uint8Array = new Uint8Array();
   // Game events
   private video: Event[] = []
   // Cell size used in mouse movement calculations
-  private readonly squareSize = 16
-  // Time
-  private score = 0
-  // Boolean used to check if Time found from game events
-  private scoreCheck = 0
-  // 3bv as a string
-  private bbbv: string[] = []
-  // 3bv as an integer
-  private bbbvint = 0
-  // 3bvs during calculations
-  private bbbvs = 0
-  // 3bvs with decimals
-  private bbbvsFinal = 0.0
-
+  private squareSize = 16
+  
   constructor (data: ArrayBuffer) {
     super(data)
+    this.mWidth = 0;
+    this.mHeight = 0;
+    this.mMines = 0;
+    this.mMarks = false;
+    this.mLevel = 0;
+    this.mBoard = [];
+    this.mPlayer = new Uint8Array();
+  }
+
+  
+  async init(){
     // 解析 RMV 录像
-    if (!this.readrmv()) {
-      this.error('Invalid RMV')
-    }
+    
+    await this.readrmv();
+    
     // 设置录像基本信息
     this.mWidth = this.w
     this.mHeight = this.h
@@ -108,38 +91,24 @@ export class RMVVideo extends BaseVideo {
     this.mMarks = this.qm !== 0
     this.mLevel = this.level + 1
     this.mBoard = this.board
+    
     // 设置玩家名称
-    this.mPlayer = new Uint8Array(this.name)
+    this.mPlayer = this.name
     // 设置录像事件
-    const eventNames: ('mv' | 'lc' | 'lr' | 'rc' | 'rr' | 'mc' | 'mr')[] = ['mv', 'lc', 'lr', 'rc', 'rr', 'mc', 'mr']
-    for (let i = 0; i < this.size; ++i) {
+    // const eventNames: ('mv' | 'lc' | 'lr' | 'rc' | 'rr' | 'mc' | 'mr')[] = ['mv', 'lc', 'lr', 'rc', 'rr', 'mc', 'mr']
+    
+    for (let i = 0; i < this.video.length; ++i) {
       const e = this.video[i]
       // Mouse event
-      if (e.event >= 1 && e.event <= 7) {
-        // console.log({
-        //   time: e.time,
-        //   mouse: eventNames[e.event - 1],
-        //   column: Math.floor(e.x / this.squareSize),
-        //   row: Math.floor(e.y / this.squareSize),
-        //   x: e.x,
-        //   y: e.y
-        // });
-      //   {
-      //     "time": 36656,
-      //     "mouse": "mv",
-      //     "column": 24,
-      //     "row": 15,
-      //     "x": 390,
-      //     "y": 248
-      // }
-        
+      
+      if (e.event && e.x < this.squareSize * this.getWidth()) {
         this.mEvents.push({
           time: e.time,
-          mouse: eventNames[e.event - 1],
+          mouse: e.event,
           column: Math.floor(e.x / this.squareSize),
           row: Math.floor(e.y / this.squareSize),
-          x: e.x,
-          y: e.y
+          x: e.x / this.squareSize * 16,
+          y: e.y / this.squareSize * 16
         })
       }
     }
@@ -148,196 +117,56 @@ export class RMVVideo extends BaseVideo {
   /**
    * Function is used to read video data
    */
-  private readrmv () {
+  private async readrmv () {
     // Initialise local variables
-    let i
-    let cur = 0
-    let c, d
-    const header1 = '*rmv'
-    let nameLength
-    let nickLength
-    let countryLength
-    let tokenLength
-    let numPreflags
-    let isFirstEvent = 1
+    let i, j;
 
-    // Check first 4 bytes of header is *rmv
-    for (i = 0; i < 4; ++i) if ((c = this.getChar()) !== header1[i]) this.error('No RMV header')
+    const ms = await import("ms-toollib");
 
-    // The getint2 function reads 2 bytes at a time
-    // In legitimate videos byte 4=0 and byte 5=1, getint2 sum is thus 1
-    if (this.getInt2() !== 1) this.error('Invalid video type')
-
-    // The getint functions reads 4 bytes at a time
-    this.getInt() // Gets byte 6-9, fs
-    const resultStringSize = this.getInt2() // Gets bytes 10-11. Value gives string length starting at LEVEL in header
-    const versionInfoSize = this.getInt2() // Gets bytes 12-13. Value gives string length starting at Viennasweeper in header
-    this.getInt2() // Gets bytes 14-15, playerInfoSize. Value gives string length starting at Name in header
-    this.getInt2() // Gets bytes 16-17, boardSize
-    const preflagsSize = this.getInt2() // Gets bytes 18-19
-    const propertiesSize = this.getInt2() // Gets bytes 20-21
-    this.getInt() // Gets bytes 22-25, vidSize
-    this.getInt2() // Gets bytes 26-27, csSize
-    this.getNum() // Gets byte 28 which is a newline
-
-    // Length of result_string_size starts 3 bytes before 'LEVEL' and ends on the '#' before Version
-    // Version 2.2 was first to have a full length header
-    // Earlier versions could have maximum header length of 35 bytes if Intermediate and 9999.99
-    // This means it is Version 2.2 or later so we want to parse more of the header
-    if (resultStringSize > 35) {
-      // Reads last part of string after '3BV'
-      for (i = 0; i < resultStringSize - 32; ++i) this.getNum()
-
-      // Fetch those last 3 bytes which should contain 3bv (either :xx or xxx)
-      // Note that lost games save 0 as the 3BV value
-      for (i = 0; i < 3; ++i) this.bbbv[i] = this.getChar()
-      if (!this.isDigit(this.bbbv[0])) this.bbbv[0] = ' '
-      if (!this.isDigit(this.bbbv[1])) this.bbbv[1] = ' '
-      if (!this.isDigit(this.bbbv[2])) this.bbbv[2] = ' '
-
-      // Throw away some bytes to get to Timestamp
-      for (i = 0; i < 16; ++i) this.getNum()
-
-      // Fetch Timestamp
-      for (i = 0; i < 10; ++i) this.timestamp += this.getChar()
-
-      // Release 2 beta and earlier versions do not have 3bv or Timestamp
-    } else {
-      this.bbbv = []
-      this.timestamp = ''
-      for (i = 0; i < resultStringSize - 3; ++i) this.getNum()
-    }
-
-    // Throw away the 2 bytes '# ' before 'Vienna...'
-    this.getInt2()
-
-    // Program is 18 bytes 'Vienna Minesweeper'
-    for (i = 0; i < 18; ++i) this.program += this.getChar()
-
-    // Throw away the ' - '
-    this.getInt3()
-
-    // Put remainder of version string into a new string
-    for (i = 0; i < versionInfoSize - 22; ++i) this.version += this.getChar()
-
-    // Home Edition 3.0H and Scoreganizer 3.0C and later have 1 extra byte (a period) before player name
-    this.getNum()
-
-    // Check next two bytes to see if player entered Name
-    const numPlayerInfo = this.getInt2()
-
-    // Fetch Player fields (name, nick, country, token) if they exist
-    // These last 3 fields were defined in Viennasweeper 3.1 RC1
-    if (numPlayerInfo > 0) {
-      nameLength = this.getNum()
-      for (i = 0; i < nameLength; ++i) this.name[i] = this.getNum()
-    }
-    if (numPlayerInfo > 1) {
-      nickLength = this.getNum()
-      for (i = 0; i < nickLength; ++i) this.nick[i] = this.getNum()
-    }
-    if (numPlayerInfo > 2) {
-      countryLength = this.getNum()
-      for (i = 0; i < countryLength; ++i) this.country[i] = this.getNum()
-    }
-    if (numPlayerInfo > 3) {
-      tokenLength = this.getNum()
-      for (i = 0; i < tokenLength; ++i) this.token[i] = this.getNum()
-    }
-
-    // Throw away next 4 bytes
-    this.getInt()
-
-    // Get board size and Mine details
-    this.w = this.getNum() // Next byte is w so 8, 9 or 1E
-    this.h = this.getNum() // Next byte is h so 8, 9 or 10
-    this.m = this.getInt2() // Next two bytes are number of mines
-
-    // Fetch board layout and put in memory
+    let aa = new ms.RmvVideo(this.mData, "");
+    
+    aa.parse();
+    aa.analyse();
+    this.w = aa.column;
+    this.h = aa.row;
+    this.m = aa.mine_num;
+    this.squareSize = aa.pix_size;
+    this.qm = 0;
+    this.level = aa.level - 3;
+    aa.current_time = 1e8;
+    let game_board: Array<Array<number>> = aa.game_board;
     this.board = new Array(this.w * this.h).fill(0)
-
-    // Every 2 bytes is x,y with 0,0 being the top left corner
-    for (i = 0; i < this.m; ++i) {
-      c = this.getNum()
-      d = this.getNum()
-      if (c > this.w || d > this.h) this.error('Invalid mine position')
-      this.board[d * this.w + c] = 1
-    }
-
-    // Check number of flags placed before game started
-    if (preflagsSize) {
-      numPreflags = this.getInt2()
-      for (i = 0; i < numPreflags; ++i) {
-        c = this.getNum()
-        d = this.getNum()
-
-        this.video[cur++] = { event: 4, time: 0, x: this.squareSize / 2 + c * this.squareSize, y: this.squareSize / 2 + d * this.squareSize }
-        this.video[cur++] = { event: 5, time: 0, x: this.squareSize / 2 + c * this.squareSize, y: this.squareSize / 2 + d * this.squareSize }
-      }
-    }
-
-    // Fetch game properties
-    this.qm = this.getNum() // Value 1 if Questionmarks used, otherwise 0
-    this.nf = this.getNum() // Value 1 if no Flags were used, otherwise 0
-    this.mode = this.getNum() // Value 0 for Classic, 1 UPK, 2 Cheat, 3 Density
-    this.level = this.getNum() // Value 0 for Beg, 1 Int, 2 Exp, 3 Custom
-
-    // Throw away rest of properties
-    for (i = 4; i < propertiesSize; ++i) this.getNum()
-
-    // Each iteration reads one event
-    while (1) {
-      this.video[cur] = <Event>{}
-      this.video[cur].event = c = this.getNum()
-      ++i
-
-      // Get next 4 bytes containing time of event
-      if (!c) {
-        this.getInt()
-        i += 4
-        // Get mouse event (3 bytes time, 1 wasted, 2 width, 2 height)
-      } else if (c <= 7) {
-        i += 8
-        this.video[cur].time = this.getInt3()
-        this.getNum()
-        this.video[cur].x = this.getInt2() - 12
-        this.video[cur].y = this.getInt2() - 56
-        cur++
-
-        // Viennasweeper does not record clicks before timer starts
-        // LR starts timer so the first LC is missed in the this.video file
-        // This code generates the missing LC in that case
-        // In other cases it generates a ghost event thus event[0] is empty
-        if (isFirstEvent) {
-          // Global variable set to 1 so on first iteration it becomes 0
-          isFirstEvent = 0
-          // Clone first recorded event but set missing event to LC
-          this.video[cur] = <Event>{}
-          this.video[cur].event = this.video[cur - 1].event
-          this.video[cur - 1].event = 2
-          this.video[cur].time = this.video[cur - 1].time
-          this.video[cur].x = this.video[cur - 1].x
-          this.video[cur].y = this.video[cur - 1].y
-          cur++
+    let total_10 = 0; // 每扫开的格子数量，看是否等于雷数
+    for(i = 0; i < this.h; i++){
+      for(j = 0; j < this.w; j++){
+        if (game_board[i][j] >= 10){
+          this.board[i * this.w + j] = 1;
+          total_10 += 1;
         }
-      } else if (c === 8) this.error('Invalid event')
-      // Get board event (ie, 'pressed' or 'number 3')
-      else if (c <= 14 || (c >= 18 && c <= 27)) {
-        i += 2
-        this.video[cur].x = this.getNum() + 1
-        this.video[cur].y = this.getNum() + 1
-        cur++
-        // Get game status (ie, 'won')
-      } else if (c <= 17) {
-        break
-      } else {
-        this.error('Invalid event')
       }
     }
+    this.name = new TextEncoder().encode(aa.player_identifier)
+    if(total_10 != this.m){
+      this.error('不能播放没有扫完的录像。')
+    }
+   
+    for (let e of aa.events) {
+      if(!e.event.is_mouse()){
+        continue;
+      }
+      const e_mouse = e.event.unwrap_mouse();
+      
+      this.video.push({
+        time: Math.round((Math.max(e.time + aa.video_start_time, 0)) * 1000),
+        x: e_mouse.x,
+        y: e_mouse.y,
+        event: e_mouse.mouse as "lc" | "rc" | "lr" | "rr" | "mc" | "mr" | "mv" | "sc" | "mt"
+      })
+    }
 
-    // Number of game events
-    this.size = cur + 1
+    return 1;
 
-    return 1
   }
 }
+
+

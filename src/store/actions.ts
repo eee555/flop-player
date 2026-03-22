@@ -133,20 +133,34 @@ async function parseVideo(type: FileType, data: ArrayBuffer, onload: (video: Bas
     switch (type) {
       case 'evf':
         {
-          const efv_video = new EVFVideo(data);
-          await efv_video.init();
-          onload(new VideoParser(efv_video, false))
+          const evf_video = new EVFVideo(data);
+          await evf_video.init();
+          onload(new VideoParser(evf_video, false))
           break
         }
       case 'avf':
-        onload(new VideoParser(new AVFVideo(data), false))
-        break
+        {
+          const avf_video = new AVFVideo(data);
+          await avf_video.init();
+          onload(new VideoParser(avf_video, false))
+          break
+        }
       case 'mvf':
-        onload(new VideoParser(new MVFVideo(data), false))
-        break
+        {
+          const mvf_video = new MVFVideo(data);
+          await mvf_video.init();
+          onload(new VideoParser(mvf_video, false))
+          break
+        }
       case 'rmv':
-        onload(new VideoParser(new RMVVideo(data), false))
-        break
+        {
+          const rmv_video = new RMVVideo(data);
+          await rmv_video.init();
+          onload(new VideoParser(rmv_video, false))
+          break
+        }
+        // onload(new VideoParser(new RMVVideo(data), false))
+        // break
       case 'rawvf':
         onload(new VideoParser(new RawVideo(data), false))
         break
