@@ -6,7 +6,8 @@
       <!-- Openings 边框路径 -->
       <path :d="openingsPath" class="openings-path" />
       <!-- Openings 编号文本 -->
-      <text v-for="(item, index) in openingsNumber" :key="index" :x="item.x" :y="item.y" class="openings-number">{{ index + 1 }}</text>
+      <text v-for="(item, index) in openingsNumber" :key="index" :x="item.x" :y="item.y" class="openings-number">{{
+        index + 1 }}</text>
     </template>
     <!-- 鼠标路径 -->
     <polyline v-if="display.isMousePathMove" ref="mousePathElement" class="mouse-move" points="" />
@@ -79,7 +80,9 @@ const handleLinePoints = (polygonElementRef: Ref<SVGPolylineElement | undefined>
     // 新增鼠标路径点位数据
     for (let i = prevLength; i < length; i++) {
       const point = targetPoints[i]
-      appendPoint(points, point.x * SVG_SCALE, point.y * SVG_SCALE)
+      if (point.x < store.state.width * SQUARE_SIZE && point.y < store.state.height * SQUARE_SIZE) {
+        appendPoint(points, point.x * SVG_SCALE, point.y * SVG_SCALE)
+      }
     }
   } else if (length < prevLength) {
     // 移除鼠标路径点位数据

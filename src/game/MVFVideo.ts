@@ -100,7 +100,7 @@
        const e = this.video[i]
        // Mouse event
        
-       if (e.event && e.x < this.squareSize * this.getWidth()) {
+       if (e.event) {
          this.mEvents.push({
            time: e.time,
            mouse: e.event,

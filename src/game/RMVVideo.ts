@@ -100,7 +100,7 @@ export class RMVVideo extends BaseVideo {
       const e = this.video[i];
       // Mouse event
 
-      if (e.event && e.x < this.squareSize * this.getWidth()) {
+      if (e.event) {
         this.mEvents.push({
           time: e.time,
           mouse: e.event,
@@ -111,6 +111,7 @@ export class RMVVideo extends BaseVideo {
         });
       }
     }
+    
   }
 
   /**
@@ -154,10 +155,6 @@ export class RMVVideo extends BaseVideo {
         continue;
       }
       const e_mouse = e.event.unwrap_mouse();
-
-      if (e_mouse.mouse != "m3v") {
-        console.log(Math.max(e.time + aa.video_start_time, 0) * 1000, e_mouse.x, e_mouse.y, e_mouse.mouse);
-      }
 
       this.video.push({
         time: Math.round(Math.max(e.time + aa.video_start_time, 0) * 1000),
