@@ -45,6 +45,7 @@ controlBar:
   displayVideoMap: Mauspfad anzeigen
   hideVideoMap: Mauspfad ausblenden
   reset: Neustart
+  download: Herunterladen
 
 common:
   loading: Lädt...

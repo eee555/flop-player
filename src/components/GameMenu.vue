@@ -15,14 +15,14 @@
           <template v-if="!availableLocales.includes(locale)">
             <a-menu-item>
               <CheckOutlined />
-              {{ locale }}
+              {{ getLocaleName(locale) }}
             </a-menu-item>
             <a-menu-divider />
           </template>
           <a-menu-item v-for="(item, key) in availableLocales" :key="key" @click="changeLocales(item)">
             <CheckOutlined v-if="locale === item" />
             <a-icon-empty v-else />
-            {{ $t('menu.options.language', item) }}
+            {{ getLocaleName(item) }}
           </a-menu-item>
         </a-sub-menu>
 
@@ -60,6 +60,7 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { i18n } from '@/plugins/i18n'
 import { store } from '@/store'
 import { GAME_TOP_UPPER, SQUARE_SIZE_ARRAY } from '@/game/constants'
 import { CheckOutlined, ExpandAltOutlined, GlobalOutlined } from '@ant-design/icons-vue'
@@ -79,6 +80,17 @@ export default defineComponent({
     // 切换语言
     const changeLocales = (item: string) => store.commit('setLocale', item)
 
+    // 获取指定语言的显示名称（显示该 locale 自身的 menu.options.language）
+    const getLocaleName = (item: string | { value?: string }) => {
+      const key = typeof item === 'string' ? item : (item && (item as any).value) || ''
+      try {
+        const msg = (i18n.global.getLocaleMessage(key) || {}) as any
+        return (msg && msg.menu && msg.menu.options && msg.menu.options.language) || key
+      } catch (e) {
+        return key
+      }
+    }
+
     // 用户设置的方块实际显示边长
     const squareSize = computed(() => store.state.squareSize)
     // 所有可选的方块实际显示边长
@@ -86,7 +98,7 @@ export default defineComponent({
     // 设置方块实际显示边长
     const changeSquareSize = (squareSize: number) => store.commit('setSquareSize', squareSize)
 
-    return { width, locale, availableLocales, changeLocales, squareSize, availableSquareSize, changeSquareSize }
+    return { width, locale, availableLocales, changeLocales, squareSize, availableSquareSize, changeSquareSize, getLocaleName }
   }
 })
 </script>

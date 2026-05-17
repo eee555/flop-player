@@ -15,7 +15,7 @@ export const storageDefault = {
   // 是否检测文件拖放，这个设置本身是没什么必要的，主要是想让用户知道有这个功能 (￣▽￣)
   fileDrag: true,
   // 当前语言
-  locale: i18n.global.locale,
+  locale: i18n.global.locale.value,
   // 游戏速度
   gameSpeed: 1.0,
   // 是否显示录像地图
@@ -54,7 +54,7 @@ const localStoragePlugin = (store: VuexStore): void => {
     // 更新本地缓存的语言
     storage.value.locale = value
     // 更新当前显示的语言
-    i18n.global.locale = value
+    i18n.global.locale.value = value
   }, {
     // 首次赋值时更新，因为如果有语言缓存，需要将当前显示的语言更新为缓存对应的值
     immediate: true

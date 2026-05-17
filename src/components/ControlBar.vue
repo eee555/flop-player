@@ -21,7 +21,7 @@
             <EyeOutlined v-else />
           </template>
         </a-button>
-        <a-button :title="`${isVideoMap ? $t('controlBar.hideVideoMap') : $t('controlBar.displayVideoMap')}`"
+        <a-button :title="$t('controlBar.download')"
           size="small" @click="download()">
           <template #icon>
             <DownloadOutlined />

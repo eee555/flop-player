@@ -45,6 +45,7 @@ controlBar:
   displayVideoMap: 顯示鼠標路徑
   hideVideoMap: 隱藏鼠標路徑
   reset: 重置
+  download: 下載
 
 common:
   loading: 加載中...

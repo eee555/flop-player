@@ -45,6 +45,7 @@ controlBar:
   displayVideoMap: Display mouse path
   hideVideoMap: Hide mouse path
   reset: Reset
+  download: Download
 
 common:
   loading: Loading...

@@ -52,6 +52,7 @@ controlBar:
   displayVideoMap: 显示鼠标路径
   hideVideoMap: 隐藏鼠标路径
   reset: 重置
+  download: 下载
 
 # 通用
 common:
